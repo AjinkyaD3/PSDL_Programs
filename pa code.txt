@@ -1,0 +1,465 @@
+1. for addition of 2 numbers 
+#include<pic18f4550.h>
+#include<XC.h>
+
+void main(void){
+
+int num1 = 0x02;
+int num2 = 0x04;
+int sum = num1+num2;
+TRISB=0;
+PORTB=sum;// here I can either use latb if I am right 
+while(1); // while loop so that program does not exit immediately 
+
+}
+
+2. for addition of array of n number 
+#include<pic18f4550.h>
+#include<xc.h>
+
+void main(void){
+int arr[5] = {0x01,0x02,0x03,0x04,0x05};	
+int sum;
+
+for(int i=0; i<5; i++){
+sum+= arr[i];
+	
+}
+
+TRISB=0;
+LATB=sum;
+PORTB=sum;
+
+}
+
+3 . for multiplication 
+
+#include<pic18f4550.h>
+#include<xc.h>
+
+void main(void){
+	int num1 = 0x02;
+	int num2 = 0x05;
+
+	int sum = num1*num2;
+
+TRISB=0;
+LATB=sum;
+
+//or there is an another way of successive addition that will do the same because i dont know normal multiplication works in it or not 
+
+int sum2;
+for (int i =0;i<num2;i++){
+	sum2+=num1;
+}
+TRISB=0;
+LATB=sum2;
+}
+
+4. for division 
+#include <pic18f4550.h>
+#include <xc.h>
+
+void main(void) {
+    int num1 = 0x10;  // 16 in decimal
+    int num2 = 0x04;  // 4 in decimal
+    int result;
+
+    result = num1 / num2;  // Division operator works fine
+
+    TRISB = 0;  // Set PORTB pins as output
+    LATB = result; // Output the result to PORTB
+
+    while (1);  // Infinite loop to keep the program running
+}
+or this 
+#include <pic18f4550.h>
+#include <xc.h>
+
+void main(void) {
+    int num1 = 0x10;  // 16 in decimal
+    int num2 = 0x04;  // 4 in decimal
+    int result = 0;
+
+    while (num1 >= num2) {  // Subtract num2 from num1 until num1 < num2
+        num1 -= num2;
+        result++;
+    }
+
+    TRISB = 0;  // Set PORTB pins as output
+    LATB = result; // Output the result of the manual division
+
+    while (1);  // Infinite loop to keep the program running
+}
+
+5. led blinking 
+#include <pic18f4550.h>
+#include <xc.h>
+
+// Simple delay function using nested loops
+void delay(unsigned int time) {
+    for (unsigned int i = 0; i < time; i++) {
+        for (unsigned int j = 0; j < 100; j++) {
+            // Do nothing, just waste time
+            ;
+        }
+    }
+}
+
+void main(void) {
+    TRISB = 0x00;   // Set PORTB as output
+    LATB = 0x00;    // Clear all PORTB outputs
+
+    while (1) {
+        LATB = 0xFF;     // Turn ON all LEDs connected to PORTB
+        delay(500);      // Delay
+        LATB = 0x00;     // Turn OFF all LEDs
+        delay(500);      // Delay again
+    }
+}
+
+
+6.buzzer 
+
+#include <pic18f4550.h> /* Contains PIC18F4550 specifications */
+#define Buzzer LATAbits.LATA5 /* Define buzzer pin */
+
+unsigned int count = 0;
+
+void interrupt Timer1_ISR()
+{
+if(TMR1IF==1)
+{
+
+
+//TMR1=0xCF2C;
+
+TMR1L = 0x20;
+TMR1H = 0xD1;
+
+count ++;
+
+if (count >= 1000) //measure upto 1000 ms i.e. 1 seconds
+{
+
+Buzzer = ~Buzzer; /* Toggle buzzer pin */
+count = 0; //reset count
+
+}
+
+TMR1IF = 0; //timer1 overflow flag to 0
+
+}
+
+}
+void main()
+{
+
+TRISB=0; /* Set as output port */
+
+TRISAbits.TRISA5 = 0; //set buzzer pin RA5 as output
+
+GIE=1; /* Enable Global Interrupt */
+
+PEIE=1; /* Enable Peripheral Interrupt */
+
+TMR1IE=1; /* Enable Timer1 Overflow Interrupt */
+
+TMR1IF=0;
+/* Enable 16-bit TMR1 register,no pre-scale,internal clock, timer OFF */
+
+T1CON=0x80; /*1:8 prescale*/
+
+TMR1L = 0x20;
+
+TMR1H = 0xD1;
+
+TMR1ON=1; /* Turn ON Timer1 */
+
+while(1);
+}
+
+7.led interfacing 
+#include <p18f4550.h>   // Contains PIC18F4550 specifications
+
+#define LCD_EN LATAbits.LATA1   // Define LCD Enable Pin
+#define LCD_RS LATAbits.LATA0   // Define LCD Register Select Pin
+#define LCDPORT LATB            // Define LCD Data Port
+
+// Delay function
+void lcd_delay(unsigned int time) {
+    unsigned int i, j;
+    for (i = 0; i < time; i++) {
+        for (j = 0; j < 100; j++);
+    }
+}
+
+// Send Instruction/Command to LCD
+void SendInstruction(unsigned char command) {
+    LCD_RS = 0;          // RS low : Instruction Register
+    LCDPORT = command;   // Put command on data lines
+    LCD_EN = 1;          // EN High
+    lcd_delay(10);
+    LCD_EN = 0;          // EN Low; command sampled at falling edge
+    lcd_delay(10);
+}
+
+// Send Data to LCD
+void SendData(unsigned char lcddata) {
+    LCD_RS = 1;          // RS High : Data Register
+    LCDPORT = lcddata;   // Put data on data lines
+    LCD_EN = 1;          // EN High
+    lcd_delay(10);
+    LCD_EN = 0;          // EN Low; data sampled at falling edge
+    lcd_delay(10);
+}
+
+// LCD Initialization
+void InitLCD(void) {
+    ADCON1 = 0x0F;        // Set all pins as digital
+    TRISB = 0x00;         // Set PORTB as output for data
+    TRISAbits.TRISA0 = 0; // Set RA0 as output (RS)
+    TRISAbits.TRISA1 = 0; // Set RA1 as output (EN)
+    
+    SendInstruction(0x38); // 8-bit mode, 2 lines, 5x7 dots
+    SendInstruction(0x06); // Entry mode set
+    SendInstruction(0x0C); // Display ON, Cursor OFF
+    SendInstruction(0x01); // Clear display
+    SendInstruction(0x80); // Set DDRAM address to 1st line
+}
+
+// Global Strings to display
+unsigned char *String1 = "Microembedded";
+unsigned char *String2 = "PIC-18F Board";
+
+// Main function
+void main(void) {
+    InitLCD(); // Initialize LCD
+    
+    // Display first string
+    while (*String1) {
+        SendData(*String1);
+        String1++;
+    }
+    
+    // Move cursor to second line
+    SendInstruction(0xC0); // Set DDRAM address to 2nd line
+    
+    // Display second string
+    while (*String2) {
+        SendData(*String2);
+        String2++;
+    }
+    
+    while (1); // Infinite loop
+}
+
+
+8. PWN servo motor 
+/* Calculations
+* Fosc = 48MHz
+*
+* PWM Period = [(PR2) + 1] * 4 * TMR2 Prescale Value / Fosc
+* PWM Period = 200us
+* TMR2 Prescale = 16
+* Hence, PR2 = 149 or 0x95
+*
+* Duty Cycle = 10% of 200us
+* Duty Cycle = 20us
+* Duty Cycle = (CCPR1L:CCP1CON<5:4>) * TMR2 Prescale Value / Fosc
+* CCP1CON<5:4> = <1:1>
+* Hence, CCPR1L = 15 or 0x0F
+*/
+#include<p18f4550.h>
+unsigned char count=0; bit
+TIMER,SPEED_UP;
+void timer2Init(void)
+{
+T2CON = 0b00000010; //Prescalar = 16; Timer2 OFF PR2 =
+0x95; //Period Register
+}
+void delay(unsigned int time)
+{
+unsigned int i,j;
+for(i=0;i<time;i++)
+for(j=0;j<1000;j++);
+}
+void main(void)
+{
+unsigned int i;
+TRISCbits.TRISC1 = 0; //RC1 pin as output
+TRISCbits.TRISC2 = 0; //CCP1 pin as output
+LATCbits.LATC1 = 0;
+CCP1CON = 0b00111100; //Select PWM mode; Duty cycle LSB CCP1CON<4:5> = <1:1> CCPR1L =
+0x0F; //Duty cycle 10%
+timer2Init(); //Initialise Timer2
+TMR2ON = 1; //Timer2 ON
+while(1) //Loop forever
+{
+for(i=15;i<150;i++)
+{
+CCPR1L = i;
+delay(100);
+}
+for(i=150;i>15;i--)
+{
+CCPR1L = i;
+delay(100);
+}
+}
+}
+
+9.pc tp pc uart
+/* Baud Rate GENERATION
+ * n => required baudrate
+ * BRGH = 0
+ * SPBRG = (Fosc / (64 * n)) - 1
+ * For 9600 baudrate, SPBRG ≈ 77
+ */
+
+#include <p18F4550.h>
+#include <stdio.h>
+
+#define Fosc 48000000UL   // Oscillator frequency
+
+// Initialize UART
+void InitUART(unsigned int baudrate) {
+    TRISCbits.TRISC6 = 0; // TX pin set as output
+    TRISCbits.TRISC7 = 1; // RX pin set as input
+    SPBRG = (unsigned char)(((Fosc / 64) / baudrate) - 1); // Baudrate calculation
+    
+    BAUDCON = 0b00000000; // Non-inverted data; 8-bit baudrate generator
+    TXSTA = 0b00100000;   // Asynchronous 8-bit; Transmit enabled; Low speed baudrate
+    RCSTA = 0b10010000;   // Serial port enabled; 8-bit data; Single receive enabled
+}
+
+// Send a single character
+void SendChar(unsigned char data) {
+    while (TXSTAbits.TRMT == 0); // Wait until transmit register is empty
+    TXREG = data;                // Transmit data
+}
+
+// Redirect printf() to UART
+void putch(unsigned char data) {
+    SendChar(data);
+}
+
+// Receive a single character
+unsigned char GetChar(void) {
+    while (!PIR1bits.RCIF); // Wait until receive buffer becomes full
+    return RCREG;           // Return received data
+}
+
+// Main function
+void main(void) {
+    InitUART(9600); // Initialize UART with 9600 baudrate
+    
+    printf("\r\nHello MicroPIC-18F: Enter any key from Keyboard\r\n");
+    
+    while (1) {
+        printf("%c! ", GetChar()); // Receive character from PC and echo back
+    }
+}
+10. temparature 
+/*
+ * File: main.c
+ * Author: MicroEmbedded
+ * Created on October 15, 2016, 4:35 PM
+ */
+
+#include <pic18f4550.h>
+#include <stdio.h>
+
+// LCD Pin Definitions
+#define LCD_EN  LATAbits.LATA1
+#define LCD_RS  LATAbits.LA0
+#define LCDPORT LATB
+
+unsigned char str[16];
+
+// LCD Delay Function
+void lcd_delay(unsigned int time) {
+    unsigned int i, j;
+    for (i = 0; i < time; i++) {
+        for (j = 0; j < 100; j++);
+    }
+}
+
+// Send Command to LCD
+void SendInstruction(unsigned char command) {
+    LCD_RS = 0;        // RS low : Instruction
+    LCDPORT = command;
+    LCD_EN = 1;        // EN High
+    lcd_delay(10);
+    LCD_EN = 0;        // EN Low; command sampled at EN falling edge
+    lcd_delay(10);
+}
+
+// Send Data to LCD
+void SendData(unsigned char lcddata) {
+    LCD_RS = 1;        // RS HIGH : DATA
+    LCDPORT = lcddata;
+    LCD_EN = 1;        // EN High
+    lcd_delay(10);
+    LCD_EN = 0;        // EN Low; data sampled at EN falling edge
+    lcd_delay(10);
+}
+
+// Initialize LCD
+void InitLCD(void) {
+    ADCON1 = 0x0F;               // Set all pins as digital
+    TRISB = 0x00;                // Set data port as output
+    TRISAbits.TRISA0 = 0;        // RS pin as output
+    TRISAbits.TRISA1 = 0;        // EN pin as output
+
+    SendInstruction(0x38);       // 8-bit mode, 2 lines, 5x7 dots
+    SendInstruction(0x06);       // Entry mode
+    SendInstruction(0x0C);       // Display ON, Cursor OFF
+    SendInstruction(0x01);       // Clear display
+    SendInstruction(0x80);       // Set address to first line
+}
+
+// Display String on LCD at given Row and Position
+void LCD_display(unsigned int row, unsigned int pos, unsigned char *ch) {
+    if (row == 1)
+        SendInstruction(0x80 | (pos - 1));  // First row
+    else
+        SendInstruction(0xC0 | (pos - 1));  // Second row
+
+    while (*ch)
+        SendData(*ch++);
+}
+
+// ADC Initialization
+void ADCInit(void) {
+    TRISEbits.RE2 = 1;           // Set RE2 as input (AN7)
+    ADCON1 = 0b00000111;         // Reference voltages: Vdd & Vss; AN0-AN7 Analog
+    ADCON2 = 0b10101110;         // Right justified; Acquisition time 4TAD; Fosc/64
+}
+
+// Read Temperature from ADC Channel
+unsigned short Read_Temp(void) {
+    ADCON0 = 0b00011101;         // Select Channel AN7; ADC ON
+    GODONE = 1;                  // Start Conversion
+    while (GO_DONE == 1);        // Wait till conversion completes
+    return ADRES;                // Return ADC result
+}
+
+// Main Function
+int main(void) {
+    unsigned int temp;
+
+    InitLCD();
+    ADCInit();
+    LCD_display(1, 1, "Temperature:");
+
+    while (1) {
+        temp = Read_Temp();
+        temp = ((temp * 500) / 1023);     // Convert ADC value to temperature
+        sprintf(str, "%d'C ", temp);      // Prepare string to display
+        LCD_display(2, 1, str);            // Display on LCD
+        lcd_delay(9000);                   // Delay between readings
+    }
+
+    return 0;
+}
