@@ -8,8 +8,8 @@
 #include <stdio.h>
 
 // LCD Pin Definitions
-#define LCD_EN  LATAbits.LATA1
 #define LCD_RS  LATAbits.LATA0
+#define LCD_EN  LATAbits.LATA1
 #define LCDPORT LATB
 
 unsigned char str[16];

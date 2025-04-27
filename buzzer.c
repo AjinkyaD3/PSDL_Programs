@@ -9,8 +9,8 @@ void interrupt Timer1_ISR()
 if(TMR1IF==1)
 {
     //TMR1=0xCF2C;
-    TMR1L = 0x20;
     TMR1H = 0xD1;
+    TMR1L = 0x20;
 
     count++;
 

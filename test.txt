@@ -1,0 +1,63 @@
+#include <p18f4550.h>
+
+#define LCD_RS LATAbits.LATA0
+#define LCD_EN LATAbits.LATA1
+#define LCD_PORT LATB 
+
+void delay(int time) {
+    for (int i = 0; i <= time; i++) {
+        for (int j = 0; j < 100; j++);
+    }
+}
+
+void sendInstruction(unsigned char command) {
+    LCD_RS = 0;
+    LCD_PORT = command;
+    LCD_EN = 1;
+    delay(10);
+    LCD_EN = 0;
+    delay(10);
+}
+
+void sendData(unsigned char data) {
+    LCD_RS = 1;
+    LCD_PORT = data;
+    LCD_EN = 1;
+    delay(10);
+    LCD_EN = 0;
+    delay(10);
+}
+
+void initLCD(void) {
+    ADCON1 = 0x0F;             // Corrected here
+    TRISAbits.TRISA0 = 0;       // Corrected here
+    TRISAbits.TRISA1 = 0;
+    TRISB = 0x00;               // Data port also OUTPUT
+
+    sendInstruction(0x38);      // Corrected 0x36 -> 0x38
+    sendInstruction(0x06);
+    sendInstruction(0x0C);
+    sendInstruction(0x01);
+    sendInstruction(0x80);
+}
+
+unsigned char *string1 = "Ajinkya";
+unsigned char *string2 = "My code";
+
+void main(void) {
+    initLCD();
+
+    while (*string1) {
+        sendData(*string1);
+        string1++;
+    }
+
+    sendInstruction(0xC0); // Move cursor to second line
+
+    while (*string2) {
+        sendData(*string2);
+        string2++;
+    }
+
+    while (1);
+}
