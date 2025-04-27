@@ -25,7 +25,7 @@ void main(void)
     TRISCbits.TRISC2 = 0; // Set CCP1 pin (RC2) as output
     LATCbits.LATC1 = 0;   // Initially make RC1 LOW
 
-    CCP1CON = 0b00111100; // Select PWM mode; CCP1CON<5:4> bits are Duty Cycle LSBs
+    CCP1CON = 0b00111100; // (60)  Select PWM mode; CCP1CON<5:4> bits are Duty Cycle LSBs
     CCPR1L = 0x0F;        // Duty Cycle MSB (sets 10% duty cycle approx initially)
 
     timer2Init();         // Initialize Timer2
