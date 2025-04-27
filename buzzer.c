@@ -33,13 +33,14 @@ void main()
     GIE=1; /* Enable Global Interrupt */
     PEIE=1; /* Enable Peripheral Interrupt */
     TMR1IE=1; /* Enable Timer1 Overflow Interrupt */
+
     TMR1IF=0;
     
     /* Enable 16-bit TMR1 register,no pre-scale,internal clock, timer OFF */
     T1CON=0x80; /*1:8 prescale*/
 
-    TMR1L = 0x20;
     TMR1H = 0xD1;
+    TMR1L = 0x20;
 
     TMR1ON=1; /* Turn ON Timer1 */
 

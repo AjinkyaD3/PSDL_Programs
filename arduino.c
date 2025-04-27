@@ -1,7 +1,8 @@
 int led1 = 10;
 
 void setup()
-{
+{   
+    //pinMode(pin, mode) is used to set the mode of a pin (input or output);
     pinMode(led1, OUTPUT);
 }
 
