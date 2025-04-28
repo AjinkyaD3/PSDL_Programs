@@ -74,15 +74,15 @@ void LCD_display(unsigned int row, unsigned int pos, unsigned char *ch)
 void ADCInit(void)
 {
     TRISEbits.TRISE2 = 1; // Set RE2 as input (AN7)
-    ADCON1 = 0b00000111;  // Reference voltages: Vdd & Vss; AN0-AN7 Analog ====>7
-    ADCON2 = 0b10101110;  // Right justified; Acquisition time 4TAD; Fosc/64  ===>174
+    ADCON1 = 0x07;        // Reference voltages: Vdd & Vss; AN0-AN7 Analog ====>7
+    ADCON2 = 0xAE;        // Right justified; Acquisition time 4TAD; Fosc/64  ===>174
 }
 
 // Read Temperature from ADC Channel
 unsigned short Read_Temp(void)
 {
-    ADCON0 = 0b00011101; // Select Channel AN7; ADC ON
-    GODONE = 1;          // Start Conversion
+    ADCON0 = 0x1D; // Select Channel AN7; ADC ON
+    GODONE = 1;    // Start Conversion
     while (GO_DONE == 1)
         ;         // Wait till conversion completes
     return ADRES; // Return ADC result

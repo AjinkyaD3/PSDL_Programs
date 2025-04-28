@@ -48,3 +48,30 @@ void main(void) {
         printf("%c! ", GetChar()); // Receive character from PC and echo back
     }
 } 
+
+// #include <p18F4550.h>
+// #include <stdio.h>
+
+// #define Fosc 48000000UL
+
+// void InitUART(unsigned int baud) {
+//     TRISC6 = 0; TRISC7 = 1;
+//     SPBRG = (Fosc / (64UL * baud)) - 1;
+//     TXSTA = 0x20; RCSTA = 0x90; BAUDCON = 0x00;
+// }
+
+// void putch(unsigned char data) {
+//     while (!TXSTAbits.TRMT);
+//     TXREG = data;
+// }
+
+// unsigned char GetChar(void) {
+//     while (!PIR1bits.RCIF);
+//     return RCREG;
+// }
+
+// void main(void) {
+//     InitUART(9600);
+//     printf("\r\nHello MicroPIC-18F: Enter key\r\n");
+//     while (1) printf("%c ", GetChar());
+// }
